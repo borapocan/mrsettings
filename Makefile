@@ -1,6 +1,6 @@
-PROG = chaos_settings_menu
+PROG = mrsettings
 
-SRC = chaos_settings_menu.c
+SRC = mrsettings.c
 OBJ = ${SRC:.c=.o}
 
 CC = gcc
