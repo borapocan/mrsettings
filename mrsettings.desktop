@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Mr.Settings
+GenericName=System Settings
+Comment=System Settings for Mr.RobotOS
+Exec=mrsettings
+Icon=/usr/share/mrrobotos/mrrobotos.png
+Categories=Settings;System;
+Keywords=settings;system;network;display;sound;bluetooth;wifi;appearance;
+StartupNotify=true
+Terminal=false
