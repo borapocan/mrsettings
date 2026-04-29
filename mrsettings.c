@@ -21,6 +21,10 @@
 
 #include <glib/gi18n.h>
 #include <gtk/gtk.h>
+#include <gdk/x11/gdkx.h>
+#include <X11/Xlib.h>
+#include <X11/Xatom.h>
+#include <gdk-pixbuf/gdk-pixbuf.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -3530,8 +3534,8 @@ GtkWidget *keyboard_settings(void) {
 	GtkWidget *kbd_hdr = gtk_box_new(GTK_ORIENTATION_VERTICAL, 8);
 	gtk_widget_set_halign(kbd_hdr, GTK_ALIGN_CENTER);
 	gtk_widget_set_margin_bottom(kbd_hdr, 8);
-	GtkWidget *kbd_ico = gtk_image_new_from_icon_name("input-keyboard-symbolic"); // Add /usr/share/icons/Reversal/devices/scalable/blueman-keyboard.svg
-	gtk_image_set_pixel_size(GTK_IMAGE(kbd_ico), 64);
+	GtkWidget *kbd_ico = gtk_image_new_from_file("/usr/share/icons/mrrobotos/128x128/devices/keyboard.png");
+	gtk_image_set_pixel_size(GTK_IMAGE(kbd_ico), 128);
 	gtk_widget_set_halign(kbd_ico, GTK_ALIGN_CENTER);
 	gtk_box_append(GTK_BOX(kbd_hdr), kbd_ico);
 	char cm[128]; snprintf(cm,sizeof(cm),"Current: %s%s%s",kd->current_layout,
@@ -5154,7 +5158,7 @@ static GtkWidget *nav_make_page(const char *icon, const char *title) {
 
 
 /* ================================================================== */
-/* DWM Keys                                                             */
+/* MRDWM Keys                                                         */
 /* ================================================================== */
 static GtkWidget *keybindings_settings(void) {
 	GtkWidget *root    = nav_make_page("preferences-desktop-keyboard-shortcuts-symbolic", "Keybindings");
@@ -5239,19 +5243,19 @@ static GtkWidget *keybindings_settings(void) {
 			"Makes the focused window visible on every tag" },
 		{ NULL, "Bar", NULL },
 		{ "Alt + b",                  "Toggle Status Bar",
-			"Shows or hides the DWM status bar at the top of the screen" },
+			"Shows or hides the MRDWM status bar at the top of the screen" },
 		{ NULL, "Session", NULL },
-		{ "Alt + Shift + q",          "Quit DWM",
-			"Exits DWM and returns to the display manager or TTY" },
-		{ "Alt + Ctrl + Shift + q",   "Restart DWM",
-			"Recompiles and restarts DWM in place — all windows are preserved" },
+		{ "Alt + Shift + q",          "Quit MRDWM",
+			"Exits MRDWM and returns to the display manager or TTY" },
+		{ "Alt + Ctrl + Shift + q",   "Restart MRDWM",
+			"Recompiles and restarts MRDWM in place — all windows are preserved" },
 		{ NULL, NULL, NULL }
 	};
 	nav_render_table(content, tbl);
 	return root;}
 
 	/* ================================================================== */
-	/* DWM Mouse                                                            */
+	/* MRDWM Mouse                                                        */
 	/* ================================================================== */
 	static GtkWidget *clicks_settings(void) {
 		GtkWidget *root    = nav_make_page("input-mouse-symbolic", "Mouse Clicks & Buttons");
@@ -5368,11 +5372,11 @@ static GtkWidget *keybindings_settings(void) {
 /* ================================================================== */
 /* Appearance Settings                                                  */
 /* - Toggle xfce4-panel on/off                                         */
-/* - Toggle DWM bar on/off (writes config.h, triggers recompile)      */
-/* - Edit DWM color schemes via colors.h                               */
-/* - Recompile DWM + restart via SIGUSR2 → run_restart flag           */
+/* - Toggle MRDWM bar on/off (writes config.h, triggers recompile)      */
+/* - Edit MRDWM color schemes via colors.h                               */
+/* - Recompile MRDWM + restart via SIGUSR2 → run_restart flag           */
 /*                                                                      */
-/* DWM side requires in dwm.c:                                         */
+/* MRDWM side requires in dwm.c:                                         */
 /*   static int run_restart = 0;                                        */
 /*   static void sigusr2(int unused) { run_restart = 1; }              */
 /*   signal(SIGUSR2, sigusr2);   ← in setup()                         */
@@ -5758,7 +5762,7 @@ appearance_settings (void)
 		g_free (val);
 		g_signal_connect (sw, "notify::active", G_CALLBACK (app_bar_toggled), ad);
 		TOGGLE_ROW ("video-display-symbolic",
-			    "DWM Status Bar",
+			    "MRDWM Status Bar",
 			    "Toggle bar visibility (needs recompile)",
 			    sw);
 	}
@@ -5833,7 +5837,7 @@ appearance_settings (void)
 	/* ════════════════════════════════════════
 	 * SECTION 2b — DWM Color Schemes
 	 * ════════════════════════════════════════ */
-	GtkWidget *col_frame = make_section_box ("DWM Color Schemes");
+	GtkWidget *col_frame = make_section_box ("MRDWM Color Schemes");
 	GtkWidget *col_box   = g_object_get_data (G_OBJECT (col_frame), "inner-box");
 
 	/* Column headers */
@@ -5926,7 +5930,7 @@ appearance_settings (void)
 	GtkWidget *apply_box   = g_object_get_data (G_OBJECT (apply_frame), "inner-box");
 
 	GtkWidget *note = gtk_label_new (
-					 "Recompiles DWM from source and installs the new binary. "
+					 "Recompiles MRDWM from source and installs the new binary. "
 					 "All running applications are preserved during the restart.");
 
 	gtk_widget_add_css_class (note, "dim-label");
@@ -5947,7 +5951,7 @@ appearance_settings (void)
 	gtk_widget_set_margin_start  (btn_row, 16); gtk_widget_set_margin_end   (btn_row, 16);
 	gtk_widget_set_margin_top    (btn_row, 10); gtk_widget_set_margin_bottom (btn_row, 14);
 
-	GtkWidget *apply_btn = gtk_button_new_with_label ("Apply & Restart DWM");
+	GtkWidget *apply_btn = gtk_button_new_with_label ("Apply & Restart MRDWM");
 	gtk_widget_add_css_class (apply_btn, "suggested-action");
 	gtk_widget_add_css_class (apply_btn, "pill");
 	gtk_widget_set_halign    (apply_btn, GTK_ALIGN_START);
@@ -7483,6 +7487,47 @@ int main(int argc, char **argv) {
 	return status;
 }
 
+static void
+on_window_realize_icon(GtkWidget *widget, gpointer ud)
+{
+    (void)ud;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+    GdkPixbuf *pb = gdk_pixbuf_new_from_file(
+        "/usr/share/icons/mrrobotos/scalable/apps/mrsettings.png", NULL);
+    if (!pb) return;
+
+    int w = gdk_pixbuf_get_width(pb);
+    int h = gdk_pixbuf_get_height(pb);
+    guchar *pixels   = gdk_pixbuf_get_pixels(pb);
+    int     channels = gdk_pixbuf_get_n_channels(pb);
+    int     rowstride= gdk_pixbuf_get_rowstride(pb);
+    unsigned long *data = g_malloc((2 + w * h) * sizeof(unsigned long));
+    data[0] = w; data[1] = h;
+    for (int y = 0; y < h; y++)
+        for (int x = 0; x < w; x++) {
+            guchar *p = pixels + y * rowstride + x * channels;
+            guchar a = channels == 4 ? p[3] : 255;
+            data[2 + y*w + x] = ((unsigned long)a    << 24) |
+                                 ((unsigned long)p[0] << 16) |
+                                 ((unsigned long)p[1] <<  8) |
+                                  (unsigned long)p[2];
+        }
+    GdkSurface *surface  = gtk_native_get_surface(GTK_NATIVE(widget));
+    GdkDisplay *display  = gdk_surface_get_display(surface);
+    Display    *xdisplay = gdk_x11_display_get_xdisplay(display);
+    Window      xwindow  = gdk_x11_surface_get_xid(surface);
+    Atom net_wm_icon = XInternAtom(xdisplay, "_NET_WM_ICON", False);
+    XChangeProperty(xdisplay, xwindow, net_wm_icon,
+        XA_CARDINAL, 32, PropModeReplace,
+        (unsigned char*)data, 2 + w * h);
+    XFlush(xdisplay);
+    g_free(data);
+    g_object_unref(pb);
+#pragma GCC diagnostic pop
+}
+
 static void activate(GtkApplication *app, gpointer user_data) {
 	if (!window) {
 		const char *username  = g_get_user_name();
@@ -7497,7 +7542,8 @@ static void activate(GtkApplication *app, gpointer user_data) {
 		gtk_window_set_default_size(GTK_WINDOW(window),1100,700);
 		GtkWidget *header=gtk_header_bar_new();
 		gtk_window_set_titlebar(GTK_WINDOW(window),header);
-		gtk_window_set_title(GTK_WINDOW(window),"Mr.Settings - MrRobotOS System Settings");
+		gtk_window_set_title(GTK_WINDOW(window),"Mr.Settings");
+		g_signal_connect(window, "realize", G_CALLBACK(on_window_realize_icon), NULL);
 		g_object_add_weak_pointer(G_OBJECT(window),(gpointer*)&window);
 
 		/* CSS */
